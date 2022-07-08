@@ -36,7 +36,7 @@ db.sequelize.sync({ force: false }).then(() => {
   console.log("resync!");
 });
 
-// relasi db
+// relasi table db
 // user
 db.users.hasMany(db.roleprofiles, {
   foreignKey: "id_user",
