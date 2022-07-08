@@ -18,8 +18,10 @@ module.exports = (sequelize, DataTypes) => {
         "customer",
         "customerGroup",
         "device",
-        "role",
-        "user"
+        "roleprofile",
+        "user",
+        "rolelist",
+        "roleuser"
       ),
       allowNull: false,
     },
