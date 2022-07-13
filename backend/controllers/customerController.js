@@ -5,6 +5,23 @@ const Customers = db.customers;
 const newCustomer = async () => {
   return await Customers.findAll({
     order: [["id", "DESC"]],
+    include: [
+      {
+        model: db.customergroup,
+        as: "customergroup",
+        attributes: ["id", "name", "deskripsi"],
+      },
+      {
+        model: db.branch,
+        as: "branch",
+        attributes: ["id", "name", "deskripsi", "status"],
+      },
+      {
+        model: db.users,
+        as: "user",
+        attributes: ["id", "name"],
+      },
+    ],
   });
 };
 
@@ -19,6 +36,8 @@ const create = async (req, res) => {
     pic: req.body.pic,
     lat: req.body.lat,
     lng: req.body.lng,
+    id_branch: req.body.id_branch,
+    id_user: req.body.id_user,
   };
   try {
     const customer = await Customers.create(data);
@@ -34,14 +53,54 @@ const create = async (req, res) => {
 };
 
 const getAllCustomer = async (req, res) => {
-  let customer = await Customers.findAll({});
+  let branch = [];
+  let customer = await Customers.findAll({
+    order: [["id", "DESC"]],
+    where: branch.length > 0 && { id_branch: [branch] },
+    include: [
+      {
+        model: db.customergroup,
+        as: "customergroup",
+        attributes: ["id", "name", "deskripsi"],
+      },
+      {
+        model: db.branch,
+        as: "branch",
+        attributes: ["id", "name", "deskripsi", "status"],
+      },
+      {
+        model: db.users,
+        as: "user",
+        attributes: ["id", "name"],
+      },
+    ],
+  });
   req.socket.emit("customers", await newCustomer());
   res.send(customer);
 };
 
 const getOneCustomer = async (req, res) => {
   let id = req.params.id;
-  let customer = await Customers.findOne({ where: { id: id } });
+  let customer = await Customers.findOne({
+    where: { id: id },
+    include: [
+      {
+        model: db.customergroup,
+        as: "customergroup",
+        attributes: ["id", "name", "deskripsi"],
+      },
+      {
+        model: db.branch,
+        as: "branch",
+        attributes: ["id", "name", "deskripsi", "status"],
+      },
+      {
+        model: db.users,
+        as: "user",
+        attributes: ["id", "name"],
+      },
+    ],
+  });
   res.status(200).send(customer);
 };
 

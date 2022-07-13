@@ -5,6 +5,10 @@ const CustomerGroup = db.customergroup;
 const newCG = async () => {
   return await CustomerGroup.findAll({
     order: [["id", "DESC"]],
+    include: [
+      { model: db.users, as: "user", attributes: ["id", "name"] },
+      { model: db.branch, as: "branch", attributes: ["id", "name"] },
+    ],
   });
 };
 
@@ -12,6 +16,8 @@ const create = async (req, res) => {
   let data = {
     name: req.body.name,
     deskripsi: req.body.deskripsi,
+    id_user: req.body.id_user,
+    id_branch: req.body.id_branch,
   };
   try {
     const cg = await CustomerGroup.create(data);
@@ -27,14 +33,26 @@ const create = async (req, res) => {
 };
 
 const getAllCG = async (req, res) => {
-  let cg = await CustomerGroup.findAll({});
+  let cg = await CustomerGroup.findAll({
+    order: [["id", "DESC"]],
+    include: [
+      { model: db.users, as: "user", attributes: ["id", "name"] },
+      { model: db.branch, as: "branch", attributes: ["id", "name"] },
+    ],
+  });
   req.socket.emit("customergroup", await newCG());
   res.send(cg);
 };
 
 const getOneCG = async (req, res) => {
   let id = req.params.id;
-  let cg = await CustomerGroup.findOne({ where: { id: id } });
+  let cg = await CustomerGroup.findOne({
+    where: { id: id },
+    include: [
+      { model: db.users, as: "user", attributes: ["id", "name"] },
+      { model: db.branch, as: "branch", attributes: ["id", "name"] },
+    ],
+  });
   res.status(200).send(cg);
 };
 

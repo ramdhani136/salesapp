@@ -168,8 +168,8 @@ const login = async (req, res) => {
       { userId, name, username, email, phone, img, role },
       process.env.ACCESS_TOKEN_SECRET,
       {
-        expiresIn: "20s",
-        // expiresIn: "3600s",
+        // expiresIn: "20s",
+        expiresIn: "3600s",
       }
     );
 
@@ -252,11 +252,19 @@ const refreshToken = async (req, res) => {
         const role = user[0].dataValues.role;
 
         const accessToken = jwt.sign(
-          { userId, name, username, email, phone, img, role },
+          {
+            userId,
+            name,
+            username,
+            email,
+            phone,
+            img,
+            role,
+          },
           process.env.ACCESS_TOKEN_SECRET,
           {
-            expiresIn: "20s",
-            // expiresIn: "3600s",
+            // expiresIn: "20s",
+            expiresIn: "3600s",
           }
         );
 

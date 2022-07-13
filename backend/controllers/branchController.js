@@ -5,6 +5,7 @@ const Branch = db.branch;
 const newBranch = async () => {
   return await Branch.findAll({
     order: [["id", "DESC"]],
+    include: [{ model: db.users, as: "user", attributes: ["id", "name"] }],
   });
 };
 
@@ -14,6 +15,7 @@ const create = async (req, res) => {
     deskripsi: req.body.deskripsi,
     lat: req.body.lat,
     lng: req.body.lng,
+    id_user: req.body.id_user,
   };
 
   try {
@@ -29,14 +31,20 @@ const create = async (req, res) => {
 };
 
 const getAllBranch = async (req, res) => {
-  let branch = await Branch.findAll({});
+  let branch = await Branch.findAll({
+    order: [["id", "DESC"]],
+    include: [{ model: db.users, as: "user", attributes: ["id", "name"] }],
+  });
   req.socket.emit("branch", await newBranch());
   res.send(branch);
 };
 
 const getOneBranch = async (req, res) => {
   let id = req.params.id;
-  let branch = await Branch.findOne({ where: { id: id } });
+  let branch = await Branch.findOne({
+    where: { id: id },
+    include: [{ model: db.users, as: "user", attributes: ["id", "name"] }],
+  });
   res.status(200).send(branch);
 };
 

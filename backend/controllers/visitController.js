@@ -21,6 +21,13 @@ const newVisit = async () => {
         model: db.customers,
         as: "customer",
         attributes: ["id", "name", "type"],
+        include: [
+          {
+            model: db.customergroup,
+            as: "customergroup",
+            attributes: ["id", "name", "deskripsi", "status"],
+          },
+        ],
       },
     ],
     order: [["id", "DESC"]],
@@ -45,6 +52,7 @@ const create = async (req, res) => {
     lng: req.body.lng,
     id_user: req.body.id_user,
     id_branch: req.body.id_branch,
+    id_branch: req.body.id_task,
   };
 
   try {
@@ -94,6 +102,13 @@ const getAllVisit = async (req, res) => {
         model: db.customers,
         as: "customer",
         attributes: ["id", "name", "type"],
+        include: [
+          {
+            model: db.customergroup,
+            as: "customergroup",
+            attributes: ["id", "name", "deskripsi", "status"],
+          },
+        ],
       },
     ],
     order: [["id", "DESC"]],
@@ -121,6 +136,13 @@ const getOneVisit = async (req, res) => {
         model: db.customers,
         as: "customer",
         attributes: ["id", "name", "type"],
+        include: [
+          {
+            model: db.customergroup,
+            as: "customergroup",
+            attributes: ["id", "name", "deskripsi", "status"],
+          },
+        ],
       },
     ],
     order: [["id", "DESC"]],

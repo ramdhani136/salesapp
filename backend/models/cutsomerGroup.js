@@ -14,6 +14,16 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.TEXT,
       allowNull: true,
     },
+    id_user: {
+      type: DataTypes.INTEGER,
+      index: true,
+      allowNull: false,
+    },
+    id_branch: {
+      type: DataTypes.INTEGER,
+      index: true,
+      allowNull: false,
+    },
     status: { type: DataTypes.BOOLEAN, defaultValue: 1 },
   });
 

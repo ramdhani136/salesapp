@@ -11,6 +11,7 @@ module.exports = (sequelize, DataTypes) => {
       unique: true,
     },
     id_customer: { type: DataTypes.INTEGER, index: true },
+    id_customerGroup: { type: DataTypes.INTEGER, index: true },
     pic: {
       type: DataTypes.STRING,
       allowNull: true,

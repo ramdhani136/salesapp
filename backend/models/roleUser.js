@@ -13,6 +13,7 @@ module.exports = (sequelize, DataTypes) => {
     uniqid: {
       type: DataTypes.STRING,
       allowNull: false,
+      unique: true,
     },
     id_user: {
       type: DataTypes.INTEGER,

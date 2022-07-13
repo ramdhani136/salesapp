@@ -39,6 +39,11 @@ module.exports = (sequelize, DataTypes) => {
     report: { type: DataTypes.BOOLEAN, defaultValue: 0 },
     export: { type: DataTypes.BOOLEAN, defaultValue: 0 },
     status: { type: DataTypes.BOOLEAN, defaultValue: 1 },
+    id_user: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      index: true,
+    },
   });
 
   return RoleLists;

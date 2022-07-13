@@ -31,12 +31,19 @@ db.callsheets = require("./callSheetModel")(sequelize, DataTypes);
 db.roleprofiles = require("./roleProfile")(sequelize, DataTypes);
 db.rolelists = require("./roleList")(sequelize, DataTypes);
 db.roleusers = require("./roleUser")(sequelize, DataTypes);
+db.taskvisit = require("./taskVisitModel")(sequelize, DataTypes);
 
 db.sequelize.sync({ force: false }).then(() => {
   console.log("resync!");
 });
 
 // relasi table db
+// Branch
+db.branch.belongsTo(db.users, {
+  foreignKey: "id_user",
+  as: "user",
+});
+
 // user
 db.users.hasMany(db.roleprofiles, {
   foreignKey: "id_user",
@@ -80,6 +87,33 @@ db.callsheets.belongsTo(db.customers, {
   as: "customer",
 });
 
+// customer
+db.customers.belongsTo(db.customergroup, {
+  foreignKey: "id_customerGroup",
+  as: "customergroup",
+});
+
+db.customers.belongsTo(db.branch, {
+  foreignKey: "id_branch",
+  as: "branch",
+});
+
+db.customers.belongsTo(db.users, {
+  foreignKey: "id_user",
+  as: "user",
+});
+
+//customergroup
+db.customergroup.belongsTo(db.users, {
+  foreignKey: "id_user",
+  as: "user",
+});
+
+db.customergroup.belongsTo(db.branch, {
+  foreignKey: "id_branch",
+  as: "branch",
+});
+
 // Role Profile
 db.roleprofiles.hasMany(db.rolelists, {
   foreignKey: "id_role",
@@ -90,6 +124,34 @@ db.roleprofiles.hasMany(db.rolelists, {
 db.roleusers.belongsTo(db.roleprofiles, {
   foreignKey: "id_roleprofile",
   as: "roleprofile",
+});
+
+//Role Device
+db.devices.belongsTo(db.users, {
+  foreignKey: "id_user",
+  as: "user",
+});
+
+db.devices.belongsTo(db.branch, {
+  foreignKey: "id_branch",
+  as: "branch",
+});
+
+//Role list
+db.rolelists.belongsTo(db.users, {
+  foreignKey: "id_user",
+  as: "user",
+});
+
+//Role profile
+db.roleprofiles.belongsTo(db.users, {
+  foreignKey: "id_user",
+  as: "user",
+});
+
+db.roleprofiles.belongsTo(db.branch, {
+  foreignKey: "id_branch",
+  as: "branch",
 });
 
 module.exports = db;

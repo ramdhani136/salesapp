@@ -11,6 +11,7 @@ module.exports = (sequelize, DataTypes) => {
       unique: true,
     },
     id_customer: { type: DataTypes.INTEGER, index: true },
+    id_task: { type: DataTypes.INTEGER, index: true },
     address: {
       type: DataTypes.TEXT,
       allowNull: true,
@@ -44,7 +45,7 @@ module.exports = (sequelize, DataTypes) => {
     },
     img: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
     },
     signature: {
       type: DataTypes.TEXT,
@@ -71,6 +72,7 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.TEXT,
       allowNull: true,
     },
+    id_customerGroup: { type: DataTypes.INTEGER, index: true },
     id_branch: {
       type: DataTypes.INTEGER,
       allowNull: false,

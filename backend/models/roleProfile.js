@@ -14,6 +14,11 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
       index: true,
     },
+    id_branch: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      index: true,
+    },
     status: { type: DataTypes.BOOLEAN, defaultValue: 1 },
   });
 

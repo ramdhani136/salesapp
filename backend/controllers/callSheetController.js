@@ -18,7 +18,14 @@ const newCallSheet = async () => {
       {
         model: db.customers,
         as: "customer",
-        attributes: ["id", "name", "type"],
+        attributes: ["id", "name", "type", "status"],
+        include: [
+          {
+            model: db.customergroup,
+            as: "customergroup",
+            attributes: ["id", "name", "deskripsi", "status"],
+          },
+        ],
       },
     ],
     order: [["id", "DESC"]],
@@ -40,6 +47,7 @@ const create = async (req, res) => {
     id_user: req.body.id_user,
     id_branch: req.body.id_branch,
     callType: req.body.callType,
+    id_customerGroup: req.body.id_customerGroup,
   };
   try {
     const callsheets = await CallSheet.create(data);
@@ -70,7 +78,14 @@ const getAllCallSheet = async (req, res) => {
       {
         model: db.customers,
         as: "customer",
-        attributes: ["id", "name", "type"],
+        attributes: ["id", "name", "type", "status"],
+        include: [
+          {
+            model: db.customergroup,
+            as: "customergroup",
+            attributes: ["id", "name", "deskripsi", "status"],
+          },
+        ],
       },
     ],
     order: [["id", "DESC"]],
@@ -97,7 +112,14 @@ const getOneCallSheet = async (req, res) => {
       {
         model: db.customers,
         as: "customer",
-        attributes: ["id", "name", "type"],
+        attributes: ["id", "name", "type", "status"],
+        include: [
+          {
+            model: db.customergroup,
+            as: "customergroup",
+            attributes: ["id", "name", "deskripsi", "status"],
+          },
+        ],
       },
     ],
     order: [["id", "DESC"]],

@@ -12,6 +12,8 @@ const create = async (req, res) => {
   let data = {
     name: req.body.name,
     deskripsi: req.body.deskripsi,
+    id_user: req.body.id_user,
+    id_branch: req.body.id_branch,
   };
   try {
     const device = await Devices.create(data);
@@ -27,7 +29,13 @@ const create = async (req, res) => {
 };
 
 const getAllDevice = async (req, res) => {
-  let devices = await Devices.findAll({});
+  let devices = await Devices.findAll({
+    order: [["id", "DESC"]],
+    include: [
+      { model: db.users, as: "user", attributes: ["id", "name"] },
+      { model: db.branch, as: "branch", attributes: ["id", "name"] },
+    ],
+  });
   req.socket.emit("devices", await newDevices());
   res.send(devices);
 };

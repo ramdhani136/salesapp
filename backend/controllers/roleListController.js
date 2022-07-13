@@ -5,7 +5,8 @@ const RoleList = db.rolelists;
 
 const newData = async () => {
   return await RoleList.findAll({
-    order: [["id", "DESC"]],
+    order: [["doc", "ASC"]],
+    include: [{ model: db.users, as: "user", attributes: ["id", "name"] }],
   });
 };
 
@@ -22,6 +23,7 @@ const create = async (req, res) => {
     submit: req.body.submit,
     report: req.body.report,
     export: req.body.export,
+    id_user: req.body.id_user,
   };
 
   try {
@@ -39,14 +41,20 @@ const create = async (req, res) => {
 };
 
 const getAllRoleList = async (req, res) => {
-  let rolelist = await RoleList.findAll({});
+  let rolelist = await RoleList.findAll({
+    order: [["doc", "ASC"]],
+    include: [{ model: db.users, as: "user", attributes: ["id", "name"] }],
+  });
   req.socket.emit("rolelist", await newData());
   res.send(rolelist);
 };
 
 const getOneRoleList = async (req, res) => {
   let id = req.params.id;
-  let rolist = await RoleList.findOne({ where: { id: id } });
+  let rolist = await RoleList.findOne({
+    where: { id: id },
+    include: [{ model: db.users, as: "user", attributes: ["id", "name"] }],
+  });
   res.status(200).send(rolist);
 };
 
