@@ -32,6 +32,7 @@ db.roleprofiles = require("./roleProfile")(sequelize, DataTypes);
 db.rolelists = require("./roleList")(sequelize, DataTypes);
 db.roleusers = require("./roleUser")(sequelize, DataTypes);
 db.taskvisit = require("./taskVisitModel")(sequelize, DataTypes);
+db.permission = require("./permissionModel")(sequelize, DataTypes);
 
 db.sequelize.sync({ force: false }).then(() => {
   console.log("resync!");
@@ -152,6 +153,17 @@ db.roleprofiles.belongsTo(db.users, {
 db.roleprofiles.belongsTo(db.branch, {
   foreignKey: "id_branch",
   as: "branch",
+});
+
+// permission
+db.permission.belongsTo(db.users, {
+  foreignKey: "id_user",
+  as: "user",
+});
+
+db.permission.belongsTo(db.users, {
+  foreignKey: "id_created",
+  as: "created",
 });
 
 module.exports = db;

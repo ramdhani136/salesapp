@@ -14,7 +14,7 @@ const create = async (req, res) => {
   let data = {
     id_role: req.body.id_role,
     doc: req.body.doc,
-    roleid: req.body.id_role.tiString() + req.body.doc,
+    roleid: req.body.id_role.toString() + req.body.doc,
     create: req.body.create,
     read: req.body.read,
     update: req.body.update,

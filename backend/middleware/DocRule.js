@@ -7,6 +7,7 @@ const PermissionData = (req, res, next) => {
     if (err) return res.sendStatus(403);
     req.username = decoded.username;
     const role = decoded.role;
+    req.userId = decoded.userId;
     const relate = [];
     for (let i = 0; i < role.length; i++) {
       if (role[i].roleprofile.status) {
@@ -41,6 +42,9 @@ const PermissionData = (req, res, next) => {
               break;
             case "/roleuser":
               return role.doc == "roleuser";
+              break;
+            case "/permission":
+              return role.doc == "permission";
               break;
           }
         });

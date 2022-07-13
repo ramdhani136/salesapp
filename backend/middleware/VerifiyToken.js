@@ -10,6 +10,7 @@ const verifyToken = (req, res, next) => {
         status: false,
         message: "Forbiden, you have to login to access the data!",
       });
+    req.userId = decoded.userId;
     req.username = decoded.username;
     next();
   });

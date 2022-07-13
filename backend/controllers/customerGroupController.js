@@ -1,4 +1,5 @@
 const db = require("../models");
+const jwt = require("jsonwebtoken");
 
 const CustomerGroup = db.customergroup;
 
@@ -33,7 +34,15 @@ const create = async (req, res) => {
 };
 
 const getAllCG = async (req, res) => {
+  let branchs = await db.permission.findAll({
+    where: [{ id_user: req.userId }, { allow: "branch" }],
+  });
+  let isBranch = [];
+  branchs.forEach((element) => {
+    isBranch = [...isBranch, element.dataValues.value];
+  });
   let cg = await CustomerGroup.findAll({
+    where: isBranch.length > 0 && { id_branch: isBranch },
     order: [["id", "DESC"]],
     include: [
       { model: db.users, as: "user", attributes: ["id", "name"] },
@@ -45,9 +54,16 @@ const getAllCG = async (req, res) => {
 };
 
 const getOneCG = async (req, res) => {
+  let branchs = await db.permission.findAll({
+    where: [{ id_user: req.userId }, { allow: "branch" }],
+  });
+  let isBranch = [];
+  branchs.forEach((element) => {
+    isBranch = [...isBranch, element.dataValues.value];
+  });
   let id = req.params.id;
   let cg = await CustomerGroup.findOne({
-    where: { id: id },
+    where: [{ id: id }, isBranch.length > 0 && { id_branch: isBranch }],
     include: [
       { model: db.users, as: "user", attributes: ["id", "name"] },
       { model: db.branch, as: "branch", attributes: ["id", "name"] },

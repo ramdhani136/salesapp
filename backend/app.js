@@ -72,6 +72,7 @@ const callSheetRoute = require("./routes/callSheetRoute");
 const profileRoleRoute = require("./routes/roleProfileRoute");
 const roleListRoute = require("./routes/roleListRoute");
 const roleUserRoure = require("./routes/roleUserRoute");
+const permissionRoute = require("./routes/permissionRoute");
 app.use("/device", verifyToken, PermissionData, deviceRouter);
 app.use("/branch", verifyToken, PermissionData, branchRouter);
 app.use("/users", userRouter);
@@ -82,6 +83,7 @@ app.use("/callsheet", verifyToken, PermissionData, callSheetRoute);
 app.use("/roleprofile", verifyToken, PermissionData, profileRoleRoute);
 app.use("/rolelist", verifyToken, PermissionData, roleListRoute);
 app.use("/roleuser", verifyToken, PermissionData, roleUserRoure);
+app.use("/permission", verifyToken, PermissionData, permissionRoute);
 
 server.listen(port, () => {
   console.log(`Listening port : ${port}`);
