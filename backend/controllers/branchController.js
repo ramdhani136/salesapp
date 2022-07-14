@@ -29,8 +29,7 @@ const create = async (req, res) => {
 
   try {
     const branch = await Branch.create(data);
-    req.socket.emit("branch", await newBranch(req.userId, "branch"));
-
+    IO.setEmit("branches", await newBranch(req.userId, "branch"));
     res
       .status(200)
       .json({ status: true, message: "successfully save data", data: branch });
@@ -51,7 +50,7 @@ const getAllBranch = async (req, res) => {
     order: [["id", "DESC"]],
     include: [{ model: db.users, as: "user", attributes: ["id", "name"] }],
   });
-  req.socket.emit("branch", await newBranch(req.userId, "branch"));
+  IO.setEmit("branches", await newBranch(req.userId, "branch"));
   res.send(branch);
 };
 
@@ -80,7 +79,7 @@ const updateBranch = async (req, res) => {
       where: [{ id: id }, isBranch.length > 0 && { id: isBranch }],
     });
     if (branch > 0) {
-      req.socket.emit("branch", await newBranch(req.userId, "branch"));
+      IO.setEmit("branches", await newBranch(req.userId, "branch"));
       res.status(200).json({
         status: true,
         message: "successfully save data",
@@ -105,7 +104,7 @@ const deleteBranch = async (req, res) => {
       where: [{ id: id }, isBranch.length > 0 && { id: isBranch }],
     });
     if (hapus > 0) {
-      req.socket.emit("branch", await newBranch(req.userId, "branch"));
+      IO.setEmit("branches", await newBranch(req.userId, "branch"));
       res.status(200).json({
         status: true,
         message: "successfully delete data",

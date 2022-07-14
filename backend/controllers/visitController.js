@@ -120,7 +120,7 @@ const create = async (req, res) => {
           console.log(info);
         }
       });
-    req.socket.emit("visits", await newVisit(req.userId, "visit"));
+    IO.setEmit("visits", await newVisit(req.userId, "visit"));
     res
       .status(200)
       .json({ status: true, message: "successfully save data", data: visits });

@@ -67,7 +67,7 @@ const create = async (req, res) => {
   };
   try {
     const customer = await Customers.create(data);
-    req.socket.emit("customers", await newCustomer(req.userId, "customer"));
+    IO.setEmit("customers", await newCustomer(req.userId, "customer"));
     res.status(200).json({
       status: true,
       message: "successfully save data",
@@ -119,7 +119,7 @@ const getAllCustomer = async (req, res) => {
       },
     ],
   });
-  req.socket.emit("customers", await newCustomer(req.userId, "customer"));
+  IO.setEmit("customers", await newCustomer(req.userId, "customer"));
   res.send(customer);
 };
 
@@ -182,7 +182,7 @@ const updateCustomer = async (req, res) => {
     ],
   });
   if (customer > 0) {
-    req.socket.emit("customers", await newCustomer(req.userId, "customer"));
+    IO.setEmit("customers", await newCustomer(req.userId, "customer"));
     res.status(200).json({
       status: true,
       message: "successfully save data",
@@ -213,7 +213,7 @@ const deleteCustomer = async (req, res) => {
       ],
     });
     if (hapus > 0) {
-      req.socket.emit("customers", await newCustomer(req.userId));
+      IO.setEmit("customers", await newCustomer(req.userId, "customer"));
       res.status(200).json({
         status: true,
         message: "successfully delete data",

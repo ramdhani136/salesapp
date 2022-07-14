@@ -25,7 +25,7 @@ const create = async (req, res) => {
   };
   try {
     const cg = await CustomerGroup.create(data);
-    req.socket.emit("customergroup", await newCG(req.userId, "customergroup"));
+    IO.setEmit("customergroup", await newCG(req.userId, "customergroup"));
     res.status(200).json({
       status: true,
       message: "successfully save data",
@@ -46,7 +46,7 @@ const getAllCG = async (req, res) => {
       { model: db.branch, as: "branch", attributes: ["id", "name"] },
     ],
   });
-  req.socket.emit("customergroup", await newCG(req.userId, "customergroup"));
+  IO.setEmit("customergroup", await newCG(req.userId, "customergroup"));
   res.send(cg);
 };
 
@@ -77,7 +77,7 @@ const updateCG = async (req, res) => {
     where: [{ id: id }, isBranch.length > 0 && { id_branch: isBranch }],
   });
   if (cg > 0) {
-    req.socket.emit("customergroup", await newCG(req.userId, "customergroup"));
+    IO.setEmit("customergroup", await newCG(req.userId, "customergroup"));
     res.status(200).json({
       status: true,
       message: "successfully save data",
@@ -99,10 +99,7 @@ const deleteCG = async (req, res) => {
       where: [{ id: id }, isBranch.length > 0 && { id_branch: isBranch }],
     });
     if (hapus > 0) {
-      req.socket.emit(
-        "customergroup",
-        await newCG(req.userId, "customergroup")
-      );
+      IO.setEmit("customergroup", await newCG(req.userId, "customergroup"));
       res.status(200).json({
         status: true,
         message: "successfully delete data",

@@ -76,7 +76,7 @@ const create = async (req, res) => {
   };
   try {
     const callsheets = await CallSheet.create(data);
-    req.socket.emit("callsheets", await newCallSheet(req.userId, "callsheet"));
+    IO.setEmit("callsheets", await newCallSheet(req.userId, "callsheet"));
     res.status(200).json({
       status: true,
       message: "successfully save data",
@@ -135,7 +135,7 @@ const getAllCallSheet = async (req, res) => {
     ],
     order: [["id", "DESC"]],
   });
-  req.socket.emit("callsheets", await newCallSheet(req.userId, "callsheet"));
+  IO.setEmit("callsheets", await newCallSheet(req.userId, "callsheet"));
   res.send(callsheets);
 };
 
@@ -205,7 +205,7 @@ const updateCallSheet = async (req, res) => {
     ],
   });
   if (callsheets > 0) {
-    req.socket.emit("callsheets", await newCallSheet(req.userId, "callsheet"));
+    IO.setEmit("callsheets", await newCallSheet(req.userId, "callsheet"));
     res.status(200).json({
       status: true,
       message: "successfully save data",
@@ -236,10 +236,7 @@ const deleteCallSheet = async (req, res) => {
       ],
     });
     if (hapus > 0) {
-      req.socket.emit(
-        "callsheets",
-        await newCallSheet(req.userId, "callsheet")
-      );
+      IO.setEmit("callsheets", await newCallSheet(req.userId, "callsheet"));
       res.status(200).json({
         status: true,
         message: "successfully delete data",

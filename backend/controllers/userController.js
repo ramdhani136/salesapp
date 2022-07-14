@@ -86,7 +86,7 @@ const getUsers = async (req, res) => {
       ],
       attributes: ["id", "name", "username", "email", "phone", "img", "status"],
     });
-    req.socket.emit("users", await newUsers(req.userId, "user"));
+    IO.setEmit("users", await newUsers(req.userId, "user"));
     res.json({ users });
   } catch (err) {
     res.json(err);
@@ -112,7 +112,7 @@ const register = async (req, res) => {
       phone: phone,
       img: img,
     });
-    req.socket.emit("users", await newUsers(req.userId, "user"));
+    IO.setEmit("users", await newUsers(req.userId, "user"));
     res.status(200).send(user);
   } catch (error) {
     res.json(error);

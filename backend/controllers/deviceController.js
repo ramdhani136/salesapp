@@ -30,7 +30,7 @@ const create = async (req, res) => {
   };
   try {
     const device = await Devices.create(data);
-    req.socket.emit("devices", await newDevices(req.userId, "device"));
+    IO.setEmit("devices", await newDevices(req.userId, "device"));
     res.status(200).json({
       status: true,
       message: "successfully save data",
@@ -61,7 +61,7 @@ const getAllDevice = async (req, res) => {
       { model: db.branch, as: "branch", attributes: ["id", "name"] },
     ],
   });
-  req.socket.emit("devices", await newDevices(req.userId, "device"));
+  IO.setEmit("devices", await newDevices(req.userId, "device"));
   res.send(devices);
 };
 
@@ -98,7 +98,7 @@ const updateDevice = async (req, res) => {
     ],
   });
   if (devices > 0) {
-    req.socket.emit("devices", await newDevices(req.userId, "device"));
+    IO.setEmit("devices", await newDevices(req.userId, "device"));
     res.status(200).json({
       status: true,
       message: "successfully save data",
@@ -125,7 +125,7 @@ const deleteDevice = async (req, res) => {
       ],
     });
     if (hapus > 0) {
-      req.socket.emit("devices", await newDevices(req.userId, "device"));
+      IO.setEmit("devices", await newDevices(req.userId, "device"));
       res.status(200).json({
         status: true,
         message: "successfully delete data",

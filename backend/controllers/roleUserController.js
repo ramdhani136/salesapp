@@ -45,8 +45,7 @@ const create = async (req, res) => {
 
   try {
     const data = await IsData.create(input);
-    req.socket.emit("roleusers", await newProfile());
-
+    IO.setEmit("roleusers", await newData());
     res.status(200).json({
       status: true,
       message: "successfully save data",
@@ -88,7 +87,7 @@ const getAllData = async (req, res) => {
     ],
     order: [["id", "DESC"]],
   });
-  req.socket.emit("roleusers", await newData());
+  IO.setEmit("roleusers", await newData());
   res.send(data);
 };
 
@@ -103,7 +102,7 @@ const updateData = async (req, res) => {
   try {
     const data = await IsData.update(req.body, { where: { id: id } });
     if (data > 0) {
-      req.socket.emit("roleusers", await newData());
+      IO.setEmit("roleusers", await newData());
       res.status(200).json({
         status: true,
         message: "successfully save data",
@@ -122,7 +121,7 @@ const deleteData = async (req, res) => {
   try {
     const data = await IsData.destroy({ where: { id: id } });
     if (hapdataus > 0) {
-      req.socket.emit("roleusers", await newData());
+      IO.setEmit("roleusers", await newData());
       res.status(200).json({
         status: true,
         message: "successfully delete data",

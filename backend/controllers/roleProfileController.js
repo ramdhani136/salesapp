@@ -54,11 +54,7 @@ const create = async (req, res) => {
 
   try {
     const roleprofile = await RoleProfile.create(data);
-    req.socket.emit(
-      "roleprofiles",
-      await newProfile(req.userId, "roleprofile")
-    );
-
+    IO.setEmit("roleprofiles", await newProfile(req.userId, "roleprofile"));
     res.status(200).json({
       status: true,
       message: "successfully save data",
@@ -107,7 +103,7 @@ const getAllProfile = async (req, res) => {
       { model: db.branch, as: "branch", attributes: ["id", "name"] },
     ],
   });
-  req.socket.emit("roleprofiles", await newProfile(req.userId, "roleprofile"));
+  IO.setEmit("roleprofiles", await newProfile(req.userId, "roleprofile"));
   res.send(roleprofile);
 };
 
@@ -170,10 +166,7 @@ const updateProfile = async (req, res) => {
       ],
     });
     if (profile > 0) {
-      req.socket.emit(
-        "roleprofiles",
-        await newProfile(req.userId, "roleprofile")
-      );
+      IO.setEmit("roleprofiles", await newProfile(req.userId, "roleprofile"));
       res.status(200).json({
         status: true,
         message: "successfully save data",
@@ -203,10 +196,7 @@ const deleteProfile = async (req, res) => {
       ],
     });
     if (hapus > 0) {
-      req.socket.emit(
-        "roleprofiles",
-        await newProfile(req.userId, "roleprofile")
-      );
+      IO.setEmit("roleprofiles", await newProfile(req.userId, "roleprofile"));
       res.status(200).json({
         status: true,
         message: "successfully delete data",

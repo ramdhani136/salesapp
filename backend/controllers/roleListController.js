@@ -28,8 +28,7 @@ const create = async (req, res) => {
 
   try {
     const rolelist = await RoleList.create(data);
-    req.socket.emit("rolelist", await newData());
-
+    IO.setEmit("rolelist", await newData());
     res.status(200).json({
       status: true,
       message: "successfully save data",
@@ -45,7 +44,7 @@ const getAllRoleList = async (req, res) => {
     order: [["doc", "ASC"]],
     include: [{ model: db.users, as: "user", attributes: ["id", "name"] }],
   });
-  req.socket.emit("rolelist", await newData());
+  IO.setEmit("rolelist", await newData());
   res.send(rolelist);
 };
 
@@ -63,7 +62,7 @@ const updateRoleList = async (req, res) => {
   try {
     const rolist = await RoleList.update(req.body, { where: { id: id } });
     if (rolist > 0) {
-      req.socket.emit("rolelist", await newData());
+      IO.setEmit("rolelist", await newData());
       res.status(200).json({
         status: true,
         message: "successfully save data",
@@ -82,7 +81,7 @@ const deleteRoleList = async (req, res) => {
   try {
     const hapus = await RoleList.destroy({ where: { id: id } });
     if (hapus > 0) {
-      req.socket.emit("rolelist", await newData());
+      IO.setEmit("rolelist", await newData());
       res.status(200).json({
         status: true,
         message: "successfully delete data",
