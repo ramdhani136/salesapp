@@ -19,18 +19,12 @@ const newVisit = async (userId, type) => {
   const isCustomer = await permissionCustomer(userId, type);
   const isUser = await permissionUser(userId, type);
   const isWhere = [
-    isCG.length > 0 && { id_customerGroup: isCG },
     isBranch.length > 0 && { id_branch: isBranch },
     isCustomer.length > 0 && { id_customer: isCustomer },
     isUser.length > 0 && { id_user: isUser },
   ];
   let finalWhere = [];
-  if (
-    isBranch.length > 0 ||
-    isCG.length > 0 ||
-    isUser.length > 0 ||
-    isCustomer.length > 0
-  ) {
+  if (isBranch.length > 0 || isUser.length > 0 || isCustomer.length > 0) {
     finalWhere = isWhere;
   }
   return await Visits.findAll({
@@ -50,6 +44,7 @@ const newVisit = async (userId, type) => {
         model: db.customers,
         as: "customer",
         attributes: ["id", "name", "type"],
+        where: isCG.length > 0 && { id_customerGroup: isCG },
         include: [
           {
             model: db.customergroup,
@@ -82,7 +77,6 @@ const create = async (req, res) => {
   } else {
     isName = "VST" + date + paddy(1, 5).toString();
   }
-
   let data = await {
     name: isName,
     id_customer: req.body.id_customer,
@@ -135,18 +129,12 @@ const getAllVisit = async (req, res) => {
   const isCustomer = await permissionCustomer(req.userId, "visit");
   const isUser = await permissionUser(req.userId, "visit");
   const isWhere = [
-    isCG.length > 0 && { id_customerGroup: isCG },
     isBranch.length > 0 && { id_branch: isBranch },
     isCustomer.length > 0 && { id_customer: isCustomer },
     isUser.length > 0 && { id_user: isUser },
   ];
   let finalWhere = [];
-  if (
-    isBranch.length > 0 ||
-    isCG.length > 0 ||
-    isUser.length > 0 ||
-    isCustomer.length > 0
-  ) {
+  if (isBranch.length > 0 || isUser.length > 0 || isCustomer.length > 0) {
     finalWhere = isWhere;
   }
   let visits = await Visits.findAll({
@@ -165,7 +153,8 @@ const getAllVisit = async (req, res) => {
       {
         model: db.customers,
         as: "customer",
-        attributes: ["id", "name", "type"],
+        attributes: ["id", "name", "type", "id_customerGroup", "status"],
+        where: isCG.length > 0 && { id_customerGroup: isCG },
         include: [
           {
             model: db.customergroup,
@@ -190,7 +179,6 @@ const getOneVisit = async (req, res) => {
   let visits = await Visits.findOne({
     where: [
       { id: id },
-      isCG.length > 0 && { id_customerGroup: isCG },
       isBranch.length > 0 && { id_branch: isBranch },
       isCustomer.length > 0 && { id_customer: isCustomer },
       isUser.length > 0 && { id_user: isUser },
@@ -210,6 +198,7 @@ const getOneVisit = async (req, res) => {
         model: db.customers,
         as: "customer",
         attributes: ["id", "name", "type"],
+        where: isCG.length > 0 && { id_customerGroup: isCG },
         include: [
           {
             model: db.customergroup,
@@ -232,70 +221,60 @@ const getOneVisit = async (req, res) => {
 };
 
 const updateVisit = async (req, res) => {
-  const isBranch = await permissionBranch(req.userId, "visit");
-  const isCG = await permissionCG(req.userId, "visit");
-  const isCustomer = await permissionCustomer(req.userId, "visit");
-  const isUser = await permissionUser(req.userId, "visit");
   let id = req.params.id;
-  try {
-    const visits = await Visits.update(req.body, {
-      where: [
-        { id: id },
-        isCG.length > 0 && { id_customerGroup: isCG },
-        isBranch.length > 0 && { id_branch: isBranch },
-        isCustomer.length > 0 && { id_customer: isCustomer },
-        isUser.length > 0 && { id_user: isUser },
-      ],
-    });
-    IO.setEmit("visits", await newVisit(req.userId, "visit"));
-    if (visits > 0) {
+  const allData = await newVisit(req.userId, "visit");
+  isResult = allData.filter((item) => item.id == id);
+  if (isResult.length > 0) {
+    try {
+      await db.visits.update(req.body, {
+        where: { id: id },
+      });
+      IO.setEmit("visits", await newVisit(req.userId, "visit"));
       res.status(200).json({
-        message: "Successfull",
         status: true,
+        message: "successfully update data",
         data: await newVisit(req.userId, "visit"),
       });
-    } else {
+    } catch (error) {
       res.status(400).json({
         status: false,
-        message: "No data or you don't have access to this document!",
+        message: error,
       });
     }
-  } catch (error) {
-    res.status(400).json({ status: false, message: "failed to update data" });
+  } else {
+    res.status(400).json({
+      status: false,
+      message: "No data or you don't have access to this document!",
+    });
   }
 };
 
 const deleteVisit = async (req, res) => {
-  const isBranch = await permissionBranch(req.userId, "visit");
-  const isCG = await permissionCG(req.userId, "visit");
-  const isCustomer = await permissionCustomer(req.userId, "visit");
-  const isUser = await permissionUser(req.userId, "visit");
-  try {
-    let id = req.params.id;
-    const visitnya = await Visits.destroy({
-      where: [
-        { id: id },
-        isCG.length > 0 && { id_customerGroup: isCG },
-        isBranch.length > 0 && { id_branch: isBranch },
-        isCustomer.length > 0 && { id_customer: isCustomer },
-        isUser.length > 0 && { id_user: isUser },
-      ],
-    });
-    IO.setEmit("visits", await newVisit(req.userId, "visit"));
-    if (visitnya > 0) {
+  let id = req.params.id;
+  const allData = await newVisit(req.userId, "visit");
+  isResult = allData.filter((item) => item.id == id);
+  if (isResult.length > 0) {
+    try {
+      await db.visits.destroy({
+        where: { id: id },
+      });
+      IO.setEmit("visits", await newVisit(req.userId, "visit"));
       res.status(200).json({
-        message: "Successfull",
         status: true,
+        message: "successfully delete data",
         data: await newVisit(req.userId, "visit"),
       });
-    } else {
+    } catch (error) {
       res.status(400).json({
         status: false,
-        message: "No data or you don't have access to this document!",
+        message: error,
       });
     }
-  } catch (error) {
-    res.status(400).json({ status: false, message: "failed to delete data" });
+  } else {
+    res.status(400).json({
+      status: false,
+      message: "No data or you don't have access to this document!",
+    });
   }
 };
 

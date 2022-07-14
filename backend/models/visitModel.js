@@ -68,7 +68,6 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.TEXT,
       allowNull: true,
     },
-    id_customerGroup: { type: DataTypes.INTEGER, index: true },
     id_branch: {
       type: DataTypes.INTEGER,
       allowNull: false,
