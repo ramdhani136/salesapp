@@ -55,13 +55,7 @@ const port = process.env.PORT || 5000;
 
 // Import WaBot
 WaBot();
-
 // End
-
-// app.use(function (req, res, next) {
-//   req.socket = io;
-//   next();
-// });
 
 const deviceRouter = require("./routes/deviceRoute");
 const branchRouter = require("./routes/branchRoute");
@@ -85,6 +79,9 @@ app.use("/roleprofile", verifyToken, PermissionData, profileRoleRoute);
 app.use("/rolelist", verifyToken, PermissionData, roleListRoute);
 app.use("/roleuser", verifyToken, PermissionData, roleUserRoure);
 app.use("/permission", verifyToken, PermissionData, permissionRoute);
+app.get("*", function (req, res) {
+  res.status(404).send("404 NOT FOUND");
+});
 
 server.listen(port, () => {
   console.log(`Listening port : ${port}`);
