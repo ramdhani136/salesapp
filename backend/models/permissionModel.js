@@ -20,6 +20,22 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
       index: true,
     },
+    alldoc: { type: DataTypes.BOOLEAN, defaultValue: 0 },
+    doc: {
+      type: DataTypes.ENUM(
+        "customer",
+        "customergroup",
+        "callsheet",
+        "visit",
+        "device",
+        "rolelist",
+        "roleuser",
+        "roleprofile",
+        "user",
+        "branch"
+      ),
+      allowNull: true,
+    },
     status: { type: DataTypes.BOOLEAN, defaultValue: 1 },
   });
 

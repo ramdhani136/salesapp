@@ -1,10 +1,13 @@
 const db = require("../models");
 const jwt = require("jsonwebtoken");
+const { permissionBranch } = require("../utils/getPermission");
 
 const CustomerGroup = db.customergroup;
 
-const newCG = async () => {
+const newCG = async (userId, type) => {
+  const isBranch = await permissionBranch(userId, type);
   return await CustomerGroup.findAll({
+    where: isBranch.length > 0 && { id_branch: isBranch },
     order: [["id", "DESC"]],
     include: [
       { model: db.users, as: "user", attributes: ["id", "name"] },
@@ -22,7 +25,7 @@ const create = async (req, res) => {
   };
   try {
     const cg = await CustomerGroup.create(data);
-    req.socket.emit("customergroup", await newCG());
+    req.socket.emit("customergroup", await newCG(req.userId, "customergroup"));
     res.status(200).json({
       status: true,
       message: "successfully save data",
@@ -34,13 +37,7 @@ const create = async (req, res) => {
 };
 
 const getAllCG = async (req, res) => {
-  let branchs = await db.permission.findAll({
-    where: [{ id_user: req.userId }, { allow: "branch" }],
-  });
-  let isBranch = [];
-  branchs.forEach((element) => {
-    isBranch = [...isBranch, element.dataValues.value];
-  });
+  let isBranch = await permissionBranch(req.userId, "customergroup");
   let cg = await CustomerGroup.findAll({
     where: isBranch.length > 0 && { id_branch: isBranch },
     order: [["id", "DESC"]],
@@ -49,18 +46,12 @@ const getAllCG = async (req, res) => {
       { model: db.branch, as: "branch", attributes: ["id", "name"] },
     ],
   });
-  req.socket.emit("customergroup", await newCG());
+  req.socket.emit("customergroup", await newCG(req.userId, "customergroup"));
   res.send(cg);
 };
 
 const getOneCG = async (req, res) => {
-  let branchs = await db.permission.findAll({
-    where: [{ id_user: req.userId }, { allow: "branch" }],
-  });
-  let isBranch = [];
-  branchs.forEach((element) => {
-    isBranch = [...isBranch, element.dataValues.value];
-  });
+  const isBranch = await permissionBranch(req.userId, "customergroup");
   let id = req.params.id;
   let cg = await CustomerGroup.findOne({
     where: [{ id: id }, isBranch.length > 0 && { id_branch: isBranch }],
@@ -69,37 +60,59 @@ const getOneCG = async (req, res) => {
       { model: db.branch, as: "branch", attributes: ["id", "name"] },
     ],
   });
-  res.status(200).send(cg);
+  if (cg) {
+    res.status(200).send(cg);
+  } else {
+    res.status(400).json({
+      status: false,
+      message: "No data or you don't have access to this document!",
+    });
+  }
 };
 
 const updateCG = async (req, res) => {
+  const isBranch = await permissionBranch(req.userId, "customergroup");
   let id = req.params.id;
-  const cg = await CustomerGroup.update(req.body, { where: { id: id } });
+  const cg = await CustomerGroup.update(req.body, {
+    where: [{ id: id }, isBranch.length > 0 && { id_branch: isBranch }],
+  });
   if (cg > 0) {
-    req.socket.emit("customergroup", await newCG());
+    req.socket.emit("customergroup", await newCG(req.userId, "customergroup"));
     res.status(200).json({
       status: true,
       message: "successfully save data",
-      data: await newCG(),
+      data: await newCG(req.userId, "customergroup"),
     });
   } else {
-    res.status(400).json({ status: false, message: "failed to update data" });
+    res.status(400).json({
+      status: false,
+      message: "No data or you don't have access to this document!",
+    });
   }
 };
 
 const deleteCG = async (req, res) => {
+  const isBranch = await permissionBranch(req.userId, "customergroup");
   let id = req.params.id;
   try {
-    const hapus = await CustomerGroup.destroy({ where: { id: id } });
+    const hapus = await CustomerGroup.destroy({
+      where: [{ id: id }, isBranch.length > 0 && { id_branch: isBranch }],
+    });
     if (hapus > 0) {
-      req.socket.emit("customergroup", await newCG());
+      req.socket.emit(
+        "customergroup",
+        await newCG(req.userId, "customergroup")
+      );
       res.status(200).json({
         status: true,
         message: "successfully delete data",
-        data: await newCG(),
+        data: await newCG(req.userId, "customergroup"),
       });
     } else {
-      res.status(400).json({ status: false, message: "No data" });
+      res.status(400).json({
+        status: false,
+        message: "No data or you don't have access to this document!",
+      });
     }
   } catch (error) {
     res.status(400).json({ status: false, message: "failed to delete data" });

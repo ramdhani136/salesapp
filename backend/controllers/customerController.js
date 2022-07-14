@@ -1,9 +1,35 @@
 const db = require("../models");
+const {
+  permissionBranch,
+  permissionCG,
+  permissionCustomer,
+  permissionUser,
+} = require("../utils/getPermission");
 
 const Customers = db.customers;
 
-const newCustomer = async () => {
+const newCustomer = async (userId, type) => {
+  const isBranch = await permissionBranch(userId, type);
+  const isCG = await permissionCG(userId, type);
+  const isCustomer = await permissionCustomer(userId, type);
+  const isUser = await permissionUser(userId, type);
+  const isWhere = [
+    isCG.length > 0 && { id_customergroup: isCG },
+    isBranch.length > 0 && { id_branch: isBranch },
+    isCustomer.length > 0 && { id: isCustomer },
+    isUser.length > 0 && { id_user: isUser },
+  ];
+  let finalWhere = [];
+  if (
+    isBranch.length > 0 ||
+    isCG.length > 0 ||
+    isUser.length > 0 ||
+    isCustomer.length > 0
+  ) {
+    finalWhere = isWhere;
+  }
   return await Customers.findAll({
+    where: finalWhere,
     order: [["id", "DESC"]],
     include: [
       {
@@ -41,7 +67,7 @@ const create = async (req, res) => {
   };
   try {
     const customer = await Customers.create(data);
-    req.socket.emit("customers", await newCustomer());
+    req.socket.emit("customers", await newCustomer(req.userId, "customer"));
     res.status(200).json({
       status: true,
       message: "successfully save data",
@@ -53,10 +79,28 @@ const create = async (req, res) => {
 };
 
 const getAllCustomer = async (req, res) => {
-  let branch = [];
+  const isBranch = await permissionBranch(req.userId, "customer");
+  const isCG = await permissionCG(req.userId, "customer");
+  const isCustomer = await permissionCustomer(req.userId, "customer");
+  const isUser = await permissionUser(req.userId, "customer");
+  const isWhere = [
+    isCG.length > 0 && { id_customergroup: isCG },
+    isBranch.length > 0 && { id_branch: isBranch },
+    isCustomer.length > 0 && { id: isCustomer },
+    isUser.length > 0 && { id_user: isUser },
+  ];
+  let finalWhere = [];
+  if (
+    isBranch.length > 0 ||
+    isCG.length > 0 ||
+    isUser.length > 0 ||
+    isCustomer.length > 0
+  ) {
+    finalWhere = isWhere;
+  }
   let customer = await Customers.findAll({
+    where: finalWhere,
     order: [["id", "DESC"]],
-    where: branch.length > 0 && { id_branch: [branch] },
     include: [
       {
         model: db.customergroup,
@@ -75,14 +119,25 @@ const getAllCustomer = async (req, res) => {
       },
     ],
   });
-  req.socket.emit("customers", await newCustomer());
+  req.socket.emit("customers", await newCustomer(req.userId, "customer"));
   res.send(customer);
 };
 
 const getOneCustomer = async (req, res) => {
+  const isBranch = await permissionBranch(req.userId, "customer");
+  const isCG = await permissionCG(req.userId, "customer");
+  const isCustomer = await permissionCustomer(req.userId, "customer");
+  const isUser = await permissionUser(req.userId, "customer");
+
   let id = req.params.id;
   let customer = await Customers.findOne({
-    where: { id: id },
+    where: [
+      { id: id },
+      isCG.length > 0 && { id_customergroup: isCG },
+      isBranch.length > 0 && { id_branch: isBranch },
+      isCustomer.length > 0 && { id: isCustomer },
+      isUser.length > 0 && { id_user: isUser },
+    ],
     include: [
       {
         model: db.customergroup,
@@ -101,37 +156,74 @@ const getOneCustomer = async (req, res) => {
       },
     ],
   });
-  res.status(200).send(customer);
+  if (customer) {
+    res.status(200).send(customer);
+  } else {
+    res.status(400).json({
+      status: false,
+      message: "No data or you don't have access to this document!",
+    });
+  }
 };
 
 const updateCustomer = async (req, res) => {
+  const isBranch = await permissionBranch(req.userId, "customer");
+  const isCG = await permissionCG(req.userId, "customer");
+  const isCustomer = await permissionCustomer(req.userId, "customer");
+  const isUser = await permissionUser(req.userId, "customer");
   let id = req.params.id;
-  const customer = await Customers.update(req.body, { where: { id: id } });
+  const customer = await Customers.update(req.body, {
+    where: [
+      { id: id },
+      isCG.length > 0 && { id_customergroup: isCG },
+      isBranch.length > 0 && { id_branch: isBranch },
+      isCustomer.length > 0 && { id: isCustomer },
+      isUser.length > 0 && { id_user: isUser },
+    ],
+  });
   if (customer > 0) {
-    req.socket.emit("customers", await newCustomer());
+    req.socket.emit("customers", await newCustomer(req.userId, "customer"));
     res.status(200).json({
       status: true,
       message: "successfully save data",
-      data: await newCustomer(),
+      data: await newCustomer(req.userId, "customer"),
     });
   } else {
-    res.status(400).json({ status: false, message: "failed to update data" });
+    res.status(400).json({
+      status: false,
+      message: "No data or you don't have access to this document!",
+    });
   }
 };
 
 const deleteCustomer = async (req, res) => {
+  const isBranch = await permissionBranch(req.userId, "customer");
+  const isCG = await permissionCG(req.userId, "customer");
+  const isCustomer = await permissionCustomer(req.userId, "customer");
+  const isUser = await permissionUser(req.userId, "customer");
   let id = req.params.id;
   try {
-    const hapus = await Customers.destroy({ where: { id: id } });
+    const hapus = await Customers.destroy({
+      where: [
+        { id: id },
+        isCG.length > 0 && { id_customergroup: isCG },
+        isBranch.length > 0 && { id_branch: isBranch },
+        isCustomer.length > 0 && { id: isCustomer },
+        isUser.length > 0 && { id_user: isUser },
+      ],
+    });
     if (hapus > 0) {
-      req.socket.emit("customers", await newCustomer());
+      req.socket.emit("customers", await newCustomer(req.userId));
       res.status(200).json({
         status: true,
         message: "successfully delete data",
-        data: await newCustomer(),
+        data: await newCustomer(req.userId, "customer"),
       });
     } else {
-      res.status(400).json({ status: false, message: "No data" });
+      res.status(400).json({
+        status: false,
+        message: "No data or you don't have access to this document!",
+      });
     }
   } catch (error) {
     res.status(400).json({ status: false, message: "failed to delete data" });

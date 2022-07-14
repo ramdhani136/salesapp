@@ -1,11 +1,14 @@
 const db = require("../models");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const { permissionUser } = require("../utils/getPermission");
 
 const Users = db.users;
 
-const newUsers = async () => {
+const newUsers = async (userId, type) => {
+  const isUser = await permissionUser(userId, type);
   return await Users.findAll({
+    where: isUser.length > 0 && { id: isUser },
     include: [
       {
         model: db.roleusers,
@@ -44,8 +47,10 @@ const newUsers = async () => {
 };
 
 const getUsers = async (req, res) => {
+  const isUser = await permissionUser(req.userId, "user");
   try {
     const users = await Users.findAll({
+      where: isUser.length > 0 && { id: isUser },
       include: [
         {
           model: db.roleusers,
@@ -81,7 +86,7 @@ const getUsers = async (req, res) => {
       ],
       attributes: ["id", "name", "username", "email", "phone", "img", "status"],
     });
-    req.socket.emit("users", await newUsers());
+    req.socket.emit("users", await newUsers(req.userId, "user"));
     res.json({ users });
   } catch (err) {
     res.json(err);
@@ -107,7 +112,7 @@ const register = async (req, res) => {
       phone: phone,
       img: img,
     });
-    req.socket.emit("users", await newUsers());
+    req.socket.emit("users", await newUsers(req.userId, "user"));
     res.status(200).send(user);
   } catch (error) {
     res.json(error);

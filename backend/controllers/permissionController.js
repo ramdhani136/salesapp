@@ -15,13 +15,18 @@ const newData = async () => {
 const create = async (req, res) => {
   let input = {
     id_user: req.body.id_user,
-    uniqid:
-      req.body.id_user.toString() +
-      req.body.allow.toString() +
-      req.body.id_created.toString(),
+    uniqid: req.body.doc
+      ? req.body.id_user.toString() +
+        req.body.allow.toString() +
+        req.body.id_created.toString() +
+        req.body.doc.toString()
+      : req.body.id_user.toString() +
+        req.body.allow.toString() +
+        req.body.id_created.toString(),
     allow: req.body.allow,
     value: req.body.value,
     id_created: req.body.id_created,
+    doc: req.body.doc,
   };
 
   try {
