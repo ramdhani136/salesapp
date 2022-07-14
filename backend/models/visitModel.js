@@ -24,9 +24,6 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    category: {
-      type: DataTypes.ENUM("daily", "manual"),
-    },
     priceNote: {
       type: DataTypes.TEXT,
       allowNull: true,

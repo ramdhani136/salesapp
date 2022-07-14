@@ -67,7 +67,6 @@ const create = async (req, res) => {
     address: req.body.address,
     pic: req.body.pic,
     phone: req.body.phone,
-    category: req.body.category,
     priceNote: req.body.priceNote,
     remindOrderNote: req.body.remindOrderNote,
     billingNote: req.body.billingNote,

@@ -20,9 +20,6 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    category: {
-      type: DataTypes.ENUM("daily", "manual"),
-    },
     callType: {
       type: DataTypes.ENUM("in", "out"),
     },

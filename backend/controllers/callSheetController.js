@@ -64,7 +64,6 @@ const create = async (req, res) => {
     id_customer: req.body.id_customer,
     pic: req.body.pic,
     phone: req.body.phone,
-    category: req.body.category,
     priceNote: req.body.priceNote,
     remindOrderNote: req.body.remindOrderNote,
     billingNote: req.body.billingNote,
