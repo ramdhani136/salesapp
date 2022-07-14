@@ -7,6 +7,9 @@ const {
   permissionCustomer,
   permissionUser,
 } = require("../utils/getPermission");
+const { Op } = require("sequelize");
+const { paddy } = require("../utils/paddy");
+var IO = require("../app");
 
 const Visits = db.visits;
 
@@ -61,8 +64,27 @@ const newVisit = async (userId, type) => {
 };
 
 const create = async (req, res) => {
+  const date =
+    new Date().getFullYear().toString() +
+    paddy(new Date().getMonth() + 1, 2).toString();
+  const lastVisit = await db.visits.findOne({
+    where: { name: { [Op.like]: `%${date}%` } },
+    order: [["name", "DESC"]],
+  });
+
+  let isName = "";
+  if (lastVisit) {
+    let masterNumber = parseInt(
+      lastVisit.name.substr(9, lastVisit.name.length)
+    );
+
+    isName = "VST" + date + paddy(masterNumber + 1, 5).toString();
+  } else {
+    isName = "VST" + date + paddy(1, 5).toString();
+  }
+
   let data = await {
-    name: req.body.name,
+    name: isName,
     id_customer: req.body.id_customer,
     address: req.body.address,
     pic: req.body.pic,
@@ -71,21 +93,19 @@ const create = async (req, res) => {
     remindOrderNote: req.body.remindOrderNote,
     billingNote: req.body.billingNote,
     compInformNote: req.body.compInformNote,
-    img: req.body.name + ".jpg",
+    img: isName + ".jpg",
     signature: req.body.signature,
     lat: req.body.lat,
     lng: req.body.lng,
     id_user: req.body.id_user,
     id_branch: req.body.id_branch,
-    id_branch: req.body.id_task,
   };
-
   try {
     const visits = await Visits.create(data);
     const compressedImage = await path.join(
       __dirname,
       "../public/images",
-      req.body.name + ".jpg"
+      isName + ".jpg"
     );
     await sharp(req.file.path)
       .resize(640, 480)
@@ -157,7 +177,7 @@ const getAllVisit = async (req, res) => {
     ],
     order: [["id", "DESC"]],
   });
-  req.socket.emit("visits", await newVisit(req.userId, "visit"));
+  IO.setEmit("visits", await newVisit(req.userId, "visit"));
   res.send(visits);
 };
 
@@ -227,7 +247,7 @@ const updateVisit = async (req, res) => {
         isUser.length > 0 && { id_user: isUser },
       ],
     });
-    req.socket.emit("visits", await newVisit(req.userId, "visit"));
+    IO.setEmit("visits", await newVisit(req.userId, "visit"));
     if (visits > 0) {
       res.status(200).json({
         message: "Successfull",
@@ -261,7 +281,7 @@ const deleteVisit = async (req, res) => {
         isUser.length > 0 && { id_user: isUser },
       ],
     });
-    req.socket.emit("visits", await newVisit(req.userId, "visit"));
+    IO.setEmit("visits", await newVisit(req.userId, "visit"));
     if (visitnya > 0) {
       res.status(200).json({
         message: "Successfull",

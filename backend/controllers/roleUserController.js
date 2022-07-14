@@ -1,6 +1,6 @@
 const { Op } = require("sequelize");
 const db = require("../models");
-
+var IO = require("../app");
 const IsData = db.roleusers;
 
 const newData = async () => {

@@ -1,7 +1,7 @@
 const db = require("../models");
 const jwt = require("jsonwebtoken");
 const { permissionBranch } = require("../utils/getPermission");
-
+var IO = require("../app");
 const CustomerGroup = db.customergroup;
 
 const newCG = async (userId, type) => {

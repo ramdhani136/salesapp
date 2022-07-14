@@ -11,7 +11,6 @@ module.exports = (sequelize, DataTypes) => {
       unique: true,
     },
     id_customer: { type: DataTypes.INTEGER, index: true },
-    id_task: { type: DataTypes.INTEGER, index: true },
     address: {
       type: DataTypes.TEXT,
       allowNull: true,

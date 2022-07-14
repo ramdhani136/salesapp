@@ -1,7 +1,7 @@
 const { Op } = require("sequelize");
 const db = require("../models");
 const { permissionBranch, permissionUser } = require("../utils/getPermission");
-
+var IO = require("../app");
 const RoleProfile = db.roleprofiles;
 
 const newProfile = async (userId, type) => {

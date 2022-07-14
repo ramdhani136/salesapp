@@ -1,6 +1,6 @@
 const db = require("../models");
 const { permissionBranch, permissionUser } = require("../utils/getPermission");
-
+var IO = require("../app");
 const Devices = db.devices;
 
 const newDevices = async (userId, type) => {

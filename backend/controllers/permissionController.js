@@ -1,5 +1,5 @@
 const db = require("../models");
-
+var IO = require("../app");
 const IsData = db.permission;
 
 const newData = async () => {

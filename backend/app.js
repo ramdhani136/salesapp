@@ -55,12 +55,13 @@ const port = process.env.PORT || 5000;
 
 // Import WaBot
 WaBot();
+
 // End
 
-app.use(function (req, res, next) {
-  req.socket = io;
-  next();
-});
+// app.use(function (req, res, next) {
+//   req.socket = io;
+//   next();
+// });
 
 const deviceRouter = require("./routes/deviceRoute");
 const branchRouter = require("./routes/branchRoute");

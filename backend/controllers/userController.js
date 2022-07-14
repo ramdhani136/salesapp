@@ -2,7 +2,7 @@ const db = require("../models");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { permissionUser } = require("../utils/getPermission");
-
+var IO = require("../app");
 const Users = db.users;
 
 const newUsers = async (userId, type) => {
