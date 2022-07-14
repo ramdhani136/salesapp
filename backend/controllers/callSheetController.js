@@ -1,9 +1,35 @@
 const db = require("../models");
+const {
+  permissionBranch,
+  permissionCG,
+  permissionCustomer,
+  permissionUser,
+} = require("../utils/getPermission");
 
 const CallSheet = db.callsheets;
 
-const newCallSheet = async () => {
+const newCallSheet = async (userId, type) => {
+  const isBranch = await permissionBranch(userId, type);
+  const isCG = await permissionCG(userId, type);
+  const isCustomer = await permissionCustomer(userId, type);
+  const isUser = await permissionUser(userId, type);
+  const isWhere = [
+    isCG.length > 0 && { id_customerGroup: isCG },
+    isBranch.length > 0 && { id_branch: isBranch },
+    isCustomer.length > 0 && { id_customer: isCustomer },
+    isUser.length > 0 && { id_user: isUser },
+  ];
+  let finalWhere = [];
+  if (
+    isBranch.length > 0 ||
+    isCG.length > 0 ||
+    isUser.length > 0 ||
+    isCustomer.length > 0
+  ) {
+    finalWhere = isWhere;
+  }
   return await CallSheet.findAll({
+    where: finalWhere,
     include: [
       {
         model: db.users,
@@ -51,7 +77,7 @@ const create = async (req, res) => {
   };
   try {
     const callsheets = await CallSheet.create(data);
-    req.socket.emit("callsheets", await newCallSheet());
+    req.socket.emit("callsheets", await newCallSheet(req.userId, "callsheet"));
     res.status(200).json({
       status: true,
       message: "successfully save data",
@@ -63,7 +89,27 @@ const create = async (req, res) => {
 };
 
 const getAllCallSheet = async (req, res) => {
+  const isBranch = await permissionBranch(req.userId, "callsheet");
+  const isCG = await permissionCG(req.userId, "callsheet");
+  const isCustomer = await permissionCustomer(req.userId, "callsheet");
+  const isUser = await permissionUser(req.userId, "callsheet");
+  const isWhere = [
+    isCG.length > 0 && { id_customerGroup: isCG },
+    isBranch.length > 0 && { id_branch: isBranch },
+    isCustomer.length > 0 && { id_customer: isCustomer },
+    isUser.length > 0 && { id_user: isUser },
+  ];
+  let finalWhere = [];
+  if (
+    isBranch.length > 0 ||
+    isCG.length > 0 ||
+    isUser.length > 0 ||
+    isCustomer.length > 0
+  ) {
+    finalWhere = isWhere;
+  }
   let callsheets = await CallSheet.findAll({
+    where: finalWhere,
     include: [
       {
         model: db.users,
@@ -90,14 +136,24 @@ const getAllCallSheet = async (req, res) => {
     ],
     order: [["id", "DESC"]],
   });
-  req.socket.emit("callsheets", await newCallSheet());
+  req.socket.emit("callsheets", await newCallSheet(req.userId, "callsheet"));
   res.send(callsheets);
 };
 
 const getOneCallSheet = async (req, res) => {
+  const isBranch = await permissionBranch(req.userId, "callsheet");
+  const isCG = await permissionCG(req.userId, "callsheet");
+  const isCustomer = await permissionCustomer(req.userId, "callsheet");
+  const isUser = await permissionUser(req.userId, "callsheet");
   let id = req.params.id;
   let callsheets = await CallSheet.findOne({
-    where: { id: id },
+    where: [
+      { id: id },
+      isCG.length > 0 && { id_customerGroup: isCG },
+      isBranch.length > 0 && { id_branch: isBranch },
+      isCustomer.length > 0 && { id_customer: isCustomer },
+      isUser.length > 0 && { id_user: isUser },
+    ],
     include: [
       {
         model: db.users,
@@ -124,40 +180,80 @@ const getOneCallSheet = async (req, res) => {
     ],
     order: [["id", "DESC"]],
   });
-  res.status(200).send(callsheets);
+  if (callsheets) {
+    res.status(200).send(callsheets);
+  } else {
+    res.status(400).json({
+      status: false,
+      message: "No data or you don't have access to this document!",
+    });
+  }
 };
 
 const updateCallSheet = async (req, res) => {
+  const isBranch = await permissionBranch(req.userId, "callsheet");
+  const isCG = await permissionCG(req.userId, "callsheet");
+  const isCustomer = await permissionCustomer(req.userId, "callsheet");
+  const isUser = await permissionUser(req.userId, "callsheet");
   let id = req.params.id;
-  const callsheets = await CallSheet.update(req.body, { where: { id: id } });
+  const callsheets = await CallSheet.update(req.body, {
+    where: [
+      { id: id },
+      isCG.length > 0 && { id_customerGroup: isCG },
+      isBranch.length > 0 && { id_branch: isBranch },
+      isCustomer.length > 0 && { id_customer: isCustomer },
+      isUser.length > 0 && { id_user: isUser },
+    ],
+  });
   if (callsheets > 0) {
-    req.socket.emit("callsheets", await newCallSheet());
+    req.socket.emit("callsheets", await newCallSheet(req.userId, "callsheet"));
     res.status(200).json({
       status: true,
       message: "successfully save data",
-      data: await newCallSheet(),
+      data: await newCallSheet(req.userId, "callsheet"),
     });
   } else {
-    res.status(400).json({ status: false, message: "failed to update data" });
+    res.status(400).json({
+      status: false,
+      message: "No data or you don't have access to this document!",
+    });
   }
 };
 
 const deleteCallSheet = async (req, res) => {
+  const isBranch = await permissionBranch(req.userId, "callsheet");
+  const isCG = await permissionCG(req.userId, "callsheet");
+  const isCustomer = await permissionCustomer(req.userId, "callsheet");
+  const isUser = await permissionUser(req.userId, "callsheet");
   let id = req.params.id;
   try {
-    const hapus = await CallSheet.destroy({ where: { id: id } });
+    const hapus = await CallSheet.destroy({
+      where: [
+        { id: id },
+        isCG.length > 0 && { id_customerGroup: isCG },
+        isBranch.length > 0 && { id_branch: isBranch },
+        isCustomer.length > 0 && { id_customer: isCustomer },
+        isUser.length > 0 && { id_user: isUser },
+      ],
+    });
     if (hapus > 0) {
-      req.socket.emit("callsheets", await newCallSheet());
+      req.socket.emit(
+        "callsheets",
+        await newCallSheet(req.userId, "callsheet")
+      );
       res.status(200).json({
         status: true,
         message: "successfully delete data",
-        data: await newCallSheet(),
+        data: await newCallSheet(req.userId, "callsheet"),
       });
     } else {
-      res.status(400).json({ status: false, message: "No data" });
+      res.status(400).json({
+        status: false,
+        message: "No data or you don't have access to this document!",
+      });
     }
   } catch (error) {
-    res.status(400).json({ status: false, message: "failed to delete data" });
+    res.status(400).json({ status: false, message: error });
   }
 };
 
