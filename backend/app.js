@@ -16,11 +16,7 @@ const { verifyToken } = require("./middleware/VerifiyToken");
 
 const io = new Server(server, {
   cors: {
-    origin: [
-      "http://localhost:3000",
-      "http://localhost:5000",
-      "http://127.0.0.1:5500",
-    ],
+    origin: "*",
     methods: ["GET", "POST"],
     transports: ["websocket", "polling", "flashsocket"],
     allowedHeaders: ["react-client"],
@@ -29,11 +25,7 @@ const io = new Server(server, {
 });
 
 const corsOptions = {
-  origin: [
-    "http://localhost:3000",
-    "http://localhost:5000",
-    "http://127.0.0.1:5500",
-  ],
+  origin: "*",
   credentials: true,
   optionSuccessStatus: 200,
 };
@@ -73,7 +65,8 @@ app.use("/branch", verifyToken, PermissionData, branchRouter);
 app.use("/users", userRouter);
 app.use("/customergroup", verifyToken, PermissionData, cgRouter);
 app.use("/customer", verifyToken, PermissionData, customerRoute);
-app.use("/visit", verifyToken, PermissionData, visitRoute);
+app.use("/visit", visitRoute);
+// app.use("/visit", verifyToken, PermissionData, visitRoute);
 app.use("/callsheet", verifyToken, PermissionData, callSheetRoute);
 app.use("/roleprofile", verifyToken, PermissionData, profileRoleRoute);
 app.use("/rolelist", verifyToken, PermissionData, roleListRoute);

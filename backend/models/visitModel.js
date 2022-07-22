@@ -77,7 +77,11 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.DATE,
     },
     isSurvey: { type: DataTypes.BOOLEAN, defaultValue: 0 },
-    status: { type: DataTypes.BOOLEAN, defaultValue: 1 },
+    // status: { type: DataTypes.BOOLEAN, defaultValue: 1 },
+    status: {
+      type: DataTypes.ENUM("0", "1", "2"),
+      allowNull: false,
+    },
   });
 
   return Visits;
