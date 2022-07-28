@@ -51,6 +51,7 @@ module.exports = (sequelize, DataTypes) => {
     rating: {
       type: DataTypes.INTEGER,
       allowNull: true,
+      defaultValue: 1,
     },
     surveyNote: {
       type: DataTypes.TEXT,
@@ -65,7 +66,10 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.DATE,
     },
     isSurvey: { type: DataTypes.BOOLEAN, defaultValue: 0 },
-    status: { type: DataTypes.BOOLEAN, defaultValue: 1 },
+    status: {
+      type: DataTypes.ENUM("0", "1", "2"),
+      allowNull: false,
+    },
   });
 
   return CallSheets;

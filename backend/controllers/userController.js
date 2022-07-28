@@ -201,11 +201,11 @@ const login = async (req, res) => {
 };
 
 const refreshToken = async (req, res) => {
+  const userId = req.params.id;
   try {
-    const refreshToken = req.cookies.refreshToken;
-    if (!refreshToken) return res.sendStatus(401);
+    if (!userId) return res.sendStatus(401);
     const user = await Users.findAll({
-      where: { refresh_token: refreshToken },
+      where: { id: userId },
       include: [
         {
           model: db.roleusers,
@@ -244,7 +244,7 @@ const refreshToken = async (req, res) => {
 
     if (!user[0]) return res.sendStatus(403);
     jwt.verify(
-      refreshToken,
+      user[0].refresh_token,
       process.env.REFRESH_TOKEN_SECRET,
       (err, decoded) => {
         if (err) return sendStatus(403);

@@ -63,6 +63,7 @@ module.exports = (sequelize, DataTypes) => {
     rating: {
       type: DataTypes.INTEGER,
       allowNull: true,
+      defaultValue: 1,
     },
     surveyNote: {
       type: DataTypes.TEXT,
