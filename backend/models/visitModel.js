@@ -10,14 +10,14 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
       unique: true,
     },
-    id_customer: { type: DataTypes.INTEGER, index: true },
+    id_customer: { type: DataTypes.INTEGER, index: true, allowNull: false },
     address: {
       type: DataTypes.TEXT,
-      allowNull: true,
+      allowNull: false,
     },
     pic: {
       type: DataTypes.STRING,
-      allowNull: true,
+      allowNull: false,
     },
     phone: {
       type: DataTypes.STRING,
@@ -41,7 +41,7 @@ module.exports = (sequelize, DataTypes) => {
     },
     img: {
       type: DataTypes.STRING,
-      allowNull: true,
+      allowNull: false,
     },
     signature: {
       type: DataTypes.TEXT,
@@ -81,7 +81,7 @@ module.exports = (sequelize, DataTypes) => {
     // status: { type: DataTypes.BOOLEAN, defaultValue: 1 },
     status: {
       type: DataTypes.ENUM("0", "1", "2"),
-      allowNull: false,
+      defaultValue: "0",
     },
   });
 

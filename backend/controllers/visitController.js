@@ -63,7 +63,7 @@ const create = async (req, res) => {
     new Date().getFullYear().toString() +
     paddy(new Date().getMonth() + 1, 2).toString();
   const lastVisit = await db.visits.findOne({
-    where: { name: { [Op.like]: `%${date}%` } },
+    where: { name: { [Op.like]: `%${paddy(req.body.id_branch, 3)}${date}%` } },
     order: [["name", "DESC"]],
   });
 
@@ -73,10 +73,16 @@ const create = async (req, res) => {
       lastVisit.name.substr(9, lastVisit.name.length)
     );
 
-    isName = "VST" + date + paddy(masterNumber + 1, 5).toString();
+    isName =
+      "VST" +
+      paddy(req.body.id_branch, 3) +
+      date +
+      paddy(masterNumber + 1, 5).toString();
   } else {
-    isName = "VST" + date + paddy(1, 5).toString();
+    isName =
+      "VST" + paddy(req.body.id_branch, 3) + date + paddy(1, 5).toString();
   }
+
   let data = await {
     name: isName,
     id_customer: req.body.id_customer,
@@ -94,32 +100,41 @@ const create = async (req, res) => {
     id_user: req.body.id_user,
     id_branch: req.body.id_branch,
   };
-  try {
-    const visits = await Visits.create(data);
-    const compressedImage = await path.join(
-      __dirname,
-      "../public/images",
-      isName + ".jpg"
-    );
-    await sharp(req.file.path)
-      .resize(640, 480)
-      .jpeg({
-        quality: 100,
-        chromaSubsampling: "4:4:4",
-      })
-      .toFile(compressedImage, (err, info) => {
-        if (err) {
-          console.log(err);
-        } else {
-          console.log(info);
-        }
+  if (req.file != undefined) {
+    try {
+      const visits = await Visits.create(data);
+      const compressedImage = await path.join(
+        __dirname,
+        "../public/images",
+        isName + ".jpg"
+      );
+      await sharp(req.file.path)
+        .resize(640, 480)
+        .jpeg({
+          quality: 100,
+          chromaSubsampling: "4:4:4",
+        })
+        .toFile(compressedImage, (err, info) => {
+          if (err) {
+            console.log(err);
+          } else {
+            console.log(info);
+          }
+        });
+      IO.setEmit("visits", await newVisit(req.userId, "visit"));
+
+      res.status(200).json({
+        status: true,
+        message: "successfully save data",
+        data: visits,
       });
-    IO.setEmit("visits", await newVisit(req.userId, "visit"));
+    } catch (error) {
+      res.status(400).json({ status: false, message: error.errors[0].message });
+    }
+  } else {
     res
-      .status(200)
-      .json({ status: true, message: "successfully save data", data: visits });
-  } catch (error) {
-    res.status(400).json({ status: false, message: error.errors[0].message });
+      .status(400)
+      .json({ status: false, message: "Please snap your images!" });
   }
 };
 
