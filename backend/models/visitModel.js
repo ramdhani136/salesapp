@@ -10,18 +10,39 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
       unique: true,
     },
-    id_customer: { type: DataTypes.INTEGER, index: true, allowNull: false },
+    id_customer: {
+      type: DataTypes.INTEGER,
+      index: true,
+      allowNull: false,
+      validate: {
+        notNull: true,
+        notEmpty: true,
+      },
+    },
     address: {
       type: DataTypes.TEXT,
+
       allowNull: false,
+      validate: {
+        notNull: true,
+        notEmpty: true,
+      },
     },
     pic: {
       type: DataTypes.STRING,
       allowNull: false,
+      validate: {
+        notNull: true,
+        notEmpty: true,
+      },
     },
     phone: {
       type: DataTypes.STRING,
       allowNull: false,
+      validate: {
+        notNull: true,
+        notEmpty: true,
+      },
     },
     priceNote: {
       type: DataTypes.TEXT,
@@ -42,6 +63,10 @@ module.exports = (sequelize, DataTypes) => {
     img: {
       type: DataTypes.STRING,
       allowNull: false,
+      validate: {
+        notNull: true,
+        notEmpty: true,
+      },
     },
     signature: {
       type: DataTypes.TEXT,
@@ -58,6 +83,10 @@ module.exports = (sequelize, DataTypes) => {
     id_user: {
       type: DataTypes.INTEGER,
       allowNull: false,
+      validate: {
+        notNull: true,
+        notEmpty: true,
+      },
       index: true,
     },
     rating: {
@@ -72,6 +101,10 @@ module.exports = (sequelize, DataTypes) => {
     id_branch: {
       type: DataTypes.INTEGER,
       allowNull: false,
+      validate: {
+        notNull: true,
+        notEmpty: true,
+      },
       index: true,
     },
     surveyAt: {

@@ -129,7 +129,10 @@ const create = async (req, res) => {
         data: visits,
       });
     } catch (error) {
-      res.status(400).json({ status: false, message: error.errors[0].message });
+      console.log(error);
+      res
+        .status(400)
+        .json({ status: false, message: `${error.table} is required` });
     }
   } else {
     res
@@ -184,38 +187,6 @@ const getAllVisit = async (req, res) => {
   IO.setEmit("visits", await newVisit(req.userId, "visit"));
   res.send(visits);
 };
-
-// const getAllVisit = async (req, res) => {
-//   let visits = await Visits.findAll({
-//     include: [
-//       {
-//         model: db.users,
-//         as: "user",
-//         attributes: ["id", "name", "username", "email", "phone"],
-//       },
-//       {
-//         model: db.branch,
-//         as: "branch",
-//         attributes: ["id", "name"],
-//       },
-//       {
-//         model: db.customers,
-//         as: "customer",
-//         attributes: ["id", "name", "type", "id_customerGroup", "status"],
-//         include: [
-//           {
-//             model: db.customergroup,
-//             as: "customergroup",
-//             attributes: ["id", "name", "deskripsi", "status"],
-//           },
-//         ],
-//       },
-//     ],
-//     order: [["name", "DESC"]],
-//   });
-//   IO.setEmit("visits", await db.visits.findAll());
-//   res.send(visits);
-// };
 
 const getOneVisit = async (req, res) => {
   const isBranch = await permissionBranch(req.userId, "visit");
