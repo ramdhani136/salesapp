@@ -60,7 +60,7 @@ const create = async (req, res) => {
     new Date().getFullYear().toString() +
     paddy(new Date().getMonth() + 1, 2).toString();
   const lastVisit = await db.callsheets.findOne({
-    where: { name: { [Op.like]: `%${date}%` } },
+    where: { name: { [Op.like]: `%${paddy(req.body.id_branch, 3)}${date}%` } },
     order: [["name", "DESC"]],
   });
 
@@ -70,9 +70,14 @@ const create = async (req, res) => {
       lastVisit.name.substr(9, lastVisit.name.length)
     );
 
-    isName = "CST" + date + paddy(masterNumber + 1, 5).toString();
+    isName =
+      "CST" +
+      paddy(req.body.id_branch, 3) +
+      date +
+      paddy(masterNumber + 1, 5).toString();
   } else {
-    isName = "CST" + date + paddy(1, 5).toString();
+    isName =
+      "CST" + paddy(req.body.id_branch, 3) + date + paddy(1, 5).toString();
   }
   let data = {
     name: isName,

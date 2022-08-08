@@ -99,6 +99,7 @@ const create = async (req, res) => {
     lng: req.body.lng,
     id_user: req.body.id_user,
     id_branch: req.body.id_branch,
+    status: req.body.status,
   };
   if (req.file != undefined) {
     try {
