@@ -241,6 +241,7 @@ const getOneVisit = async (req, res) => {
 
 const updateVisit = async (req, res) => {
   let id = req.params.id;
+
   const allData = await newVisit(req.userId, "visit");
   isResult = allData.filter((item) => item.id == id);
   if (isResult.length > 0) {
@@ -248,12 +249,46 @@ const updateVisit = async (req, res) => {
       await db.visits.update(req.body, {
         where: { id: id },
       });
-      IO.setEmit("visits", await newVisit(req.userId, "visit"));
-      res.status(200).json({
-        status: true,
-        message: "successfully update data",
-        data: await newVisit(req.userId, "visit"),
-      });
+      if (req.file != undefined) {
+        try {
+          const compressedImage = await path.join(
+            __dirname,
+            "../public/images",
+            isResult[0].img
+          );
+          await sharp(req.file.path)
+            .resize(640, 480)
+            .jpeg({
+              quality: 100,
+              chromaSubsampling: "4:4:4",
+            })
+            .toFile(compressedImage, (err, info) => {
+              if (err) {
+                console.log(err);
+              } else {
+                console.log(info);
+              }
+            });
+          IO.setEmit("visits", await newVisit(req.userId, "visit"));
+          res.status(200).json({
+            status: true,
+            message: "successfully save data",
+            data: await newVisit(req.userId, "visit"),
+          });
+        } catch (error) {
+          console.log(error);
+          res
+            .status(400)
+            .json({ status: false, message: `${error.table} is required` });
+        }
+      } else {
+        IO.setEmit("visits", await newVisit(req.userId, "visit"));
+        res.status(200).json({
+          status: true,
+          message: "successfully update data",
+          data: await newVisit(req.userId, "visit"),
+        });
+      }
     } catch (error) {
       res.status(400).json({
         status: false,

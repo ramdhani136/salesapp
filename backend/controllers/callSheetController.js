@@ -92,6 +92,7 @@ const create = async (req, res) => {
     id_user: req.body.id_user,
     id_branch: req.body.id_branch,
     callType: req.body.callType,
+    status: req.body.status,
   };
   try {
     await CallSheet.create(data);
