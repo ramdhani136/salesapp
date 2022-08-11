@@ -10,7 +10,7 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
       unique: true,
     },
-    id_customer: { type: DataTypes.INTEGER, index: true },
+    id_customer: { type: DataTypes.INTEGER, index: true, allowNull: false },
 
     pic: {
       type: DataTypes.STRING,
