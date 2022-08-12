@@ -189,6 +189,55 @@ const getAllVisit = async (req, res) => {
   res.send(visits);
 };
 
+const getByStatus = async (req, res) => {
+  let status = req.params.status;
+  const isBranch = await permissionBranch(req.userId, "visit");
+  const isCG = await permissionCG(req.userId, "visit");
+  const isCustomer = await permissionCustomer(req.userId, "visit");
+  const isUser = await permissionUser(req.userId, "visit");
+  const isWhere = [
+    { status: status },
+    isBranch.length > 0 && { id_branch: isBranch },
+    isCustomer.length > 0 && { id_customer: isCustomer },
+    isUser.length > 0 && { id_user: isUser },
+  ];
+  let finalWhere = [{ status: status }];
+  if (isBranch.length > 0 || isUser.length > 0 || isCustomer.length > 0) {
+    finalWhere = isWhere;
+  }
+  let visits = await Visits.findAll({
+    where: finalWhere,
+    include: [
+      {
+        model: db.users,
+        as: "user",
+        attributes: ["id", "name", "username", "email", "phone"],
+      },
+      {
+        model: db.branch,
+        as: "branch",
+        attributes: ["id", "name"],
+      },
+      {
+        model: db.customers,
+        as: "customer",
+        attributes: ["id", "name", "type", "id_customerGroup", "status"],
+        where: isCG.length > 0 && { id_customerGroup: isCG },
+        include: [
+          {
+            model: db.customergroup,
+            as: "customergroup",
+            attributes: ["id", "name", "deskripsi", "status"],
+          },
+        ],
+      },
+    ],
+    order: [["id", "DESC"]],
+  });
+  IO.setEmit("visits", await newVisit(req.userId, "visit"));
+  res.send(visits);
+};
+
 const getOneVisit = async (req, res) => {
   const isBranch = await permissionBranch(req.userId, "visit");
   const isCG = await permissionCG(req.userId, "visit");
@@ -345,4 +394,5 @@ module.exports = {
   updateVisit,
   deleteVisit,
   message,
+  getByStatus,
 };
