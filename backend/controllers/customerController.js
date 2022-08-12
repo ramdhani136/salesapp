@@ -123,6 +123,53 @@ const getAllCustomer = async (req, res) => {
   res.send(customer);
 };
 
+const getByBranch = async (req, res) => {
+  let id_branch = req.params.id;
+  const isBranch = await permissionBranch(req.userId, "customer");
+  const isCG = await permissionCG(req.userId, "customer");
+  const isCustomer = await permissionCustomer(req.userId, "customer");
+  const isUser = await permissionUser(req.userId, "customer");
+  const isWhere = [
+    { id_branch: id_branch },
+    isCG.length > 0 && { id_customergroup: isCG },
+    isBranch.length > 0 && { id_branch: isBranch },
+    isCustomer.length > 0 && { id: isCustomer },
+    isUser.length > 0 && { id_user: isUser },
+  ];
+  let finalWhere = [{ id_branch: id_branch }];
+  if (
+    isBranch.length > 0 ||
+    isCG.length > 0 ||
+    isUser.length > 0 ||
+    isCustomer.length > 0
+  ) {
+    finalWhere = isWhere;
+  }
+  let customer = await Customers.findAll({
+    where: finalWhere,
+    order: [["id", "DESC"]],
+    include: [
+      {
+        model: db.customergroup,
+        as: "customergroup",
+        attributes: ["id", "name", "deskripsi"],
+      },
+      {
+        model: db.branch,
+        as: "branch",
+        attributes: ["id", "name", "deskripsi", "status"],
+      },
+      {
+        model: db.users,
+        as: "user",
+        attributes: ["id", "name"],
+      },
+    ],
+  });
+  IO.setEmit("customers", await newCustomer(req.userId, "customer"));
+  res.send(customer);
+};
+
 const getOneCustomer = async (req, res) => {
   const isBranch = await permissionBranch(req.userId, "customer");
   const isCG = await permissionCG(req.userId, "customer");
@@ -236,4 +283,5 @@ module.exports = {
   getOneCustomer,
   updateCustomer,
   deleteCustomer,
+  getByBranch,
 };
